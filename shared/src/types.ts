@@ -15,3 +15,10 @@ export interface ErrorContext {
   upstream: string;
   timestamp: string;
 }
+
+export interface EnrichedError {
+  context: ErrorContext;
+  explanation: string;
+  enrichedAt: string;
+}
+
