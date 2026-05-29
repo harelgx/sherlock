@@ -18,10 +18,11 @@ fastify.all("/*", async function handler(request, reply) {
   const { host, ...forwardHeaders } = request.headers;
 
   try {
+    const hasBody = !["GET", "HEAD"].includes(request.method);
     const response = await fetch(UPSTREAM + request.url, {
       method: request.method,
       headers: forwardHeaders as Record<string, string>,
-      body: JSON.stringify(request.body),
+      body: hasBody ? JSON.stringify(request.body) : undefined,
     });
     const responseBody = await response.text();
     if (isHttpError(response.status)) {
@@ -31,8 +32,8 @@ fastify.all("/*", async function handler(request, reply) {
         responseBody,
         UPSTREAM,
       );
-      console.log("ERROR CONTEXT:", JSON.stringify(context, null, 2));
-      reply.status(response.status).send(responseBody);
+      console.log("Error Context:", JSON.stringify(context, null, 2));
+      reply.code(response.status).send(responseBody);
     } else {
       // forward success
       reply
@@ -51,7 +52,7 @@ fastify.all("/*", async function handler(request, reply) {
       UPSTREAM,
       nodeError,
     );
-    console.log("ERROR CONTEXT:", JSON.stringify(context, null, 2));
+    console.log("Error Context:", JSON.stringify(context, null, 2));
     reply.code(502).send(nodeError.message);
   }
 
