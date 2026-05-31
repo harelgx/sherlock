@@ -1,5 +1,5 @@
 import { kafka } from "./kafka.js";
-import { EnrichedError } from "../shared/src/types.js";
+import { EnrichedError } from "../../shared/src/types.js";
 
 const producer = kafka.producer();
 

@@ -5,13 +5,20 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
+    "dev": "tsx watch src/worker.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "fastify": "^5.8.5",
+    "@anthropic-ai/sdk": "^0.100.1",
+    "dotenv": "^17.4.2",
     "kafkajs": "^2.2.4"
+  },
+  "devDependencies": {
+    "@types/node": "^25.9.1",
+    "tsx": "^4.22.4",
+    "typescript": "^6.0.3"
   }
 }

@@ -1,5 +1,5 @@
 import { kafka } from "./kafka.js";
-import { ErrorContext } from "../shared/src/types.js";
+import { ErrorContext } from "../../shared/src/types.js";
 
 const consumer = kafka.consumer({ groupId: "llm-worker-group" });
 
@@ -20,4 +20,3 @@ export async function startRawErrorsConsumer(
     },
   });
 }
-
