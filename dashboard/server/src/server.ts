@@ -1,23 +1,25 @@
 import Fastify from 'fastify';
 import { WebSocketServer, WebSocket } from 'ws';
 import { startEnrichedErrorConsumer } from './consumer.js';
-import { ErrorContext } from '../../../shared/src/types.js';
+import { EnrichedError } from '../../../shared/src/types.js';
 
 const app = Fastify({ logger: true });
 
 const wss = new WebSocketServer({ noServer: true });
 
 const connections = new Set<WebSocket>();
+const errorHistory: EnrichedError[] = [];
 
-function sendErrorToSockets(context: ErrorContext):any {
+function sendErrorToSockets(error: EnrichedError): void {
+  errorHistory.push(error);
   connections.forEach(socket => {
-    socket.send(JSON.stringify(context))
+    socket.send(JSON.stringify(error))
   });
 }
 
 wss.on('connection', (socket) => {
-  connections.add(socket)
-  socket.send(JSON.stringify({ type: 'connected' }));
+  connections.add(socket);
+  errorHistory.forEach(error => socket.send(JSON.stringify(error)));
 
   socket.on('close', () => {
     connections.delete(socket);
