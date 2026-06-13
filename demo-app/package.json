@@ -1,0 +1,13 @@
+{
+  "name": "demo-app",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "start": "tsx index.ts"
+  },
+  "devDependencies": {
+    "@types/node": "^25.9.3",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.3"
+  }
+}
