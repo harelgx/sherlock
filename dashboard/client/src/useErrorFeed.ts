@@ -55,7 +55,5 @@ export function useErrorFeed(url: string) {
     }
   }, [url])
 
-  const clear = () => setErrors([])
-
-  return { errors, status, clear }
+  return { errors, status }
 }

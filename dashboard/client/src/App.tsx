@@ -50,7 +50,7 @@ function ConnectionStatus({ status }: { status: 'connecting' | 'connected' | 'di
 }
 
 export default function App() {
-  const { errors, status, clear } = useErrorFeed(WS_URL)
+  const { errors, status } = useErrorFeed(WS_URL)
   const [filter, setFilter] = useState<Filter>('all')
 
   const [theme, setTheme] = useState<Theme>(() => {
@@ -102,7 +102,7 @@ export default function App() {
 
         {/* Filter bar — only when there are errors */}
         {hasErrors && (
-          <div className="h-9 px-6 flex items-center justify-between border-t border-neutral-100 dark:border-neutral-900">
+          <div className="h-9 px-6 flex items-center border-t border-neutral-100 dark:border-neutral-900">
             <div className="flex items-center gap-0.5">
               {(['all', '5xx', '4xx', 'err'] as Filter[]).map(f => (
                 <button
@@ -121,18 +121,12 @@ export default function App() {
                 </button>
               ))}
             </div>
-            <button
-              onClick={clear}
-              className="text-xs text-neutral-300 dark:text-neutral-700 hover:text-neutral-500 dark:hover:text-neutral-500 transition-colors"
-            >
-              clear
-            </button>
           </div>
         )}
       </header>
 
       {/* Error list */}
-      <main className="max-w-3xl mx-auto">
+      <main>
         {filtered.length === 0 ? (
           <p className="text-center text-xs text-neutral-300 dark:text-neutral-700 py-32">
             {status === 'connected' ? 'waiting for errors…' : 'connecting…'}

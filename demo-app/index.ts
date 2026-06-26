@@ -1,19 +1,20 @@
 const PROXY_URL = process.env.PROXY_URL ?? "http://localhost:3000";
-const DEAD_URL = "http://localhost:9999/api/data";
 
-const CALLS: { method: string; path: string }[] = [
-  { method: "GET", path: "/posts/1" },
-  { method: "GET", path: "/users/1" },
-  { method: "GET", path: "/posts/2" },
-  { method: "GET", path: "/users/2" },
-  { method: "GET", path: "/posts/99999" },
-  { method: "GET", path: "/nonexistent" },
-  { method: "GET", path: "/users/0" },
-  { method: "POST", path: "/posts" },
-  { method: "GET", path: "http://fake-upstream-that-doesnt-exist.internal/api/data" },
-  { method: "GET", path: DEAD_URL },
-  { method: "POST", path: DEAD_URL },
-  { method: "GET", path: DEAD_URL },
+const CALLS: { method: string; path: string; upstream: string }[] = [
+  // Valid calls
+  {method: "GET", path: "/posts/10", upstream: "https://jsonplaceholder.typicode.com"},
+
+  // HTTP errors — real API
+  { method: "GET", path: "/posts/99999", upstream: "https://jsonplaceholder.typicode.com" },
+  { method: "GET", path: "/nonexistent", upstream: "https://jsonplaceholder.typicode.com" },
+  { method: "GET", path: "/users/0", upstream: "https://jsonplaceholder.typicode.com" },
+  { method: "GET", path: "/9999", upstream: "https://jsonplaceholder.typicode.com" },
+  { method: "POST", path: "/posts/99999", upstream: "https://jsonplaceholder.typicode.com" },
+
+  // Connection errors — dead server
+  { method: "GET", path: "/api/data", upstream: "http://localhost:9999" },
+  { method: "POST", path: "/api/data", upstream: "http://localhost:9999" },
+  { method: "GET", path: "/health", upstream: "http://localhost:9999" },
 ];
 
 function pick<T>(arr: T[]): T {
@@ -24,16 +25,20 @@ function randomInterval(): number {
   return 3000 + Math.random() * 2000;
 }
 
-async function sendRequest(method: string, path: string): Promise<void> {
-  const url = path.startsWith("http") ? path : PROXY_URL + path;
+async function sendRequest(method: string, path: string, upstream: string): Promise<void> {
+  const url = PROXY_URL + path;
   const isPost = method === "POST";
 
-  console.log(`→ ${method} ${url}`);
+  console.log(`→ ${method} ${url} (upstream: ${upstream})`);
 
   try {
     const res = await fetch(url, {
       method,
-      headers: isPost ? { "Content-Type": "application/json" } : undefined,
+      headers: {
+        "x-sherlock-upstream": upstream,
+        "x-sherlock-service": "demo-app",
+        ...(isPost ? { "Content-Type": "application/json" } : {}),
+      },
       body: isPost ? JSON.stringify({ title: "demo", body: "test", userId: 1 }) : undefined,
     });
     console.log(`← ${res.status} ${res.statusText}  (${method} ${path})`);
@@ -43,8 +48,8 @@ async function sendRequest(method: string, path: string): Promise<void> {
 }
 
 async function loop(): Promise<void> {
-  const { method, path } = pick(CALLS);
-  await sendRequest(method, path);
+  const { method, path, upstream } = pick(CALLS);
+  await sendRequest(method, path, upstream);
   setTimeout(loop, randomInterval());
 }
 

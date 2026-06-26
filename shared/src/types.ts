@@ -16,9 +16,14 @@ export interface ErrorContext {
   timestamp: string;
 }
 
-export interface EnrichedError {
-  context: ErrorContext;
-  explanation: string;
-  enrichedAt: string;
+export interface DiagnosisResult {
+  diagnosis: string;
+  action: string;
+  retryable: boolean;
 }
 
+export interface EnrichedError {
+  context: ErrorContext;
+  explanation: DiagnosisResult;
+  enrichedAt: string;
+}

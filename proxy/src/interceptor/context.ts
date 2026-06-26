@@ -3,7 +3,7 @@ import { ErrorContext } from "../../../shared/src/types.js";
 import { IncomingHttpHeaders } from "http";
 
 function extractCallingService(headers: IncomingHttpHeaders): string {
-  const rawService = headers["x-calling-service"];
+  const rawService = headers["x-sherlock-service"];
   const callingService = Array.isArray(rawService)
     ? rawService[0]
     : (rawService ?? "unknown");

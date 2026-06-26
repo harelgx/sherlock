@@ -6,17 +6,19 @@ export function buildPrompt(context: ErrorContext): string {
   const statusCode = response?.statusCode;
   const responseBody = response?.body;
 
-  return `You are a senior software engineering, an expert at diangosing errors. 
-            A service encountered an error calling an external API. Diagnose what went wrong and explain it clearly for the on-call engineer.
-            Calling service name: ${callingService}
-            Full URL: ${upstream}${url}
-            Method: ${method}
-            Request body: ${requestBody}
-            ${
-              nodeError
-                ? `A connection error occured. Code: ${nodeError?.code}, Message: ${nodeError?.message}`
-                : `An error occured. Code: ${response?.statusCode}, Response body: ${responseBody}`
-            }
-            Respond in 2-3 sentences. Be specific about the likely cause and whether it's retryable.
-            `;
+  const errorDetails = nodeError
+    ? `A connection error occurred. Code: ${nodeError?.code}, Message: ${nodeError?.message}`
+    : `An error occurred. Status: ${statusCode}, Response body: ${responseBody}`;
+
+  return `You are a senior software engineer expert at diagnosing API errors.
+          A service encountered an error calling an external API. Diagnose what went wrong.
+
+          Calling service: ${callingService}
+          Full URL: ${upstream}${url}
+          Method: ${method}
+          Request body: ${JSON.stringify(requestBody)}
+          ${errorDetails}
+
+          Be specific and concise. 
+        `;
 }

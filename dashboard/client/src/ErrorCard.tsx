@@ -1,5 +1,5 @@
 import { memo, useState } from 'react'
-import type { EnrichedError } from './types'
+import type { DiagnosisResult, EnrichedError } from './types'
 
 function statusColor(code: number | undefined): string {
   if (code === undefined) return 'text-neutral-400 dark:text-neutral-500'
@@ -8,16 +8,42 @@ function statusColor(code: number | undefined): string {
   return 'text-neutral-500'
 }
 
+function borderColor(code: number | undefined): string {
+  if (code === undefined) return 'border-red-500'
+  if (code >= 500) return 'border-red-500'
+  if (code >= 400) return 'border-amber-500'
+  return 'border-neutral-600'
+}
+
 function formatTs(iso: string) {
   return new Date(iso).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })
 }
 
-function renderExplanation(text: string) {
-  const cleaned = text.replace(/^#{1,3}\s+/gm, '')
-  return cleaned.split(/(\*\*[^*]+\*\*)/).map((part, i) =>
-    part.startsWith('**') && part.endsWith('**')
-      ? <strong key={i} className="font-semibold text-neutral-800 dark:text-neutral-200">{part.slice(2, -2)}</strong>
-      : <span key={i}>{part}</span>
+function DiagRow({ label, text }: { label: string; text: string }) {
+  return (
+    <div className="space-y-0.5">
+      <p className="text-[10px] font-mono uppercase tracking-wider text-neutral-400 dark:text-neutral-400">
+        {label}
+      </p>
+      <p className="text-xs text-neutral-200 leading-relaxed">
+        {text}
+      </p>
+    </div>
+  )
+}
+
+function Diagnosis({ d }: { d: DiagnosisResult }) {
+  const hasContent = d.diagnosis || d.action
+  if (!hasContent) {
+    return (
+      <p className="text-[10px] font-mono text-neutral-600 italic">not enriched</p>
+    )
+  }
+  return (
+    <div className="space-y-2">
+      {d.diagnosis && <DiagRow label="Diagnosis" text={d.diagnosis} />}
+      {d.action    && <DiagRow label="Action"    text={d.action} />}
+    </div>
   )
 }
 
@@ -38,7 +64,7 @@ export const ErrorCard = memo(function ErrorCard({ error }: { error: EnrichedErr
       onClick={toggle}
       onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle() } }}
     >
-      {/* Row 1: status · method · url · timestamp · chevron */}
+      {/* Row 1: status · method · url · enrichment dot · timestamp · chevron */}
       <div className="flex items-center gap-3">
         <span className={`text-xs font-semibold tabular-nums w-8 shrink-0 ${statusColor(statusCode)}`}>
           {statusCode ?? 'ERR'}
@@ -49,7 +75,7 @@ export const ErrorCard = memo(function ErrorCard({ error }: { error: EnrichedErr
         <span className="text-xs text-neutral-700 dark:text-neutral-300 truncate flex-1 min-w-0">
           {request.url}
         </span>
-        <span className="text-xs text-neutral-300 dark:text-neutral-700 tabular-nums shrink-0">
+<span className="text-xs text-neutral-300 dark:text-neutral-700 tabular-nums shrink-0">
           {formatTs(timestamp)}
         </span>
         <svg
@@ -60,13 +86,13 @@ export const ErrorCard = memo(function ErrorCard({ error }: { error: EnrichedErr
         </svg>
       </div>
 
-      {/* Expanded: service→upstream · nodeError · explanation */}
+      {/* Expanded: service→upstream · nodeError · diagnosis */}
       {expanded && (
-        <div className="mt-3 pl-11 space-y-2.5">
-          <div className="flex items-center gap-3">
+        <div className={`mt-2 ml-4 border-l-2 ${borderColor(statusCode)} bg-neutral-900/40 rounded-r py-2 pr-3 max-w-[680px] space-y-2.5`}>
+          <div className="pl-7 flex items-center gap-3">
             <span className="text-xs text-neutral-400 dark:text-neutral-500">
               {callingService}
-              <span className="text-neutral-300 dark:text-neutral-700 mx-1.5">→</span>
+              <span className="text-neutral-400 dark:text-neutral-500 mx-2">→</span>
               {upstream}
             </span>
             {nodeError && (
@@ -75,9 +101,9 @@ export const ErrorCard = memo(function ErrorCard({ error }: { error: EnrichedErr
               </span>
             )}
           </div>
-          <p className="text-xs text-neutral-500 dark:text-neutral-400 leading-relaxed">
-            {renderExplanation(explanation)}
-          </p>
+          <div className="pl-7">
+            <Diagnosis d={explanation} />
+          </div>
         </div>
       )}
     </div>

@@ -10,6 +10,7 @@ const producer = kafka.producer();
 
 export async function initProducer() {
   await producer.connect();
+  console.log("[kafka] producer connected")
 }
 
 export async function publishRawError(context: ErrorContext) {
@@ -17,4 +18,5 @@ export async function publishRawError(context: ErrorContext) {
     topic: "raw-errors",
     messages: [{ value: JSON.stringify(context) }],
   });
+  console.log(`  [kafka] published error to raw-errors`);
 }
