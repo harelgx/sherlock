@@ -2,8 +2,7 @@
   "name": "sherlock",
   "private": true,
   "scripts": {
-    "install:all": "npm install --prefix proxy && npm install --prefix llm-worker && npm install --prefix dashboard/server && npm install --prefix dashboard/client && npm install --prefix demo-app",
-    "dev": "concurrently --names \"proxy,worker,dash-server,dash-client,demo\" --prefix-colors \"cyan,yellow,green,magenta,blue\" \"npm run dev --prefix proxy\" \"npm run dev --prefix llm-worker\" \"npm run dev --prefix dashboard/server\" \"npm run dev --prefix dashboard/client\" \"npm run dev --prefix demo-app\""
+    "install:all": "npm install && npm install --prefix proxy && npm install --prefix llm-worker && npm install --prefix dashboard/server && npm install --prefix dashboard/client && npm install --prefix demo-app"    "dev": "concurrently --names \"proxy,worker,dash-server,dash-client,demo\" --prefix-colors \"cyan,yellow,green,magenta,blue\" \"npm run dev --prefix proxy\" \"npm run dev --prefix llm-worker\" \"npm run dev --prefix dashboard/server\" \"npm run dev --prefix dashboard/client\" \"npm run dev --prefix demo-app\""
   },
   "devDependencies": {
     "concurrently": "^8.0.0"
