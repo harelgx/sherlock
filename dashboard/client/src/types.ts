@@ -20,7 +20,6 @@ export interface DiagnosisResult {
   context: string;
   diagnosis: string;
   action: string;
-  retryable: boolean;
 }
 
 export interface EnrichedError {

@@ -17,11 +17,10 @@ startRawErrorsConsumer(async (context: ErrorContext) => {
     enrichedAt: new Date().toISOString(),
   };
   
-  const { diagnosis, action, retryable } = explanation;
+  const { diagnosis, action } = explanation;
   console.log(`[worker] Error diagnosis:\n${"─".repeat(40)}`);
   console.log(`  Diagnosis:  ${diagnosis}`);
   console.log(`  Action:     ${action}`);
-  console.log(`  Retryable:  ${retryable ? "YES" : "NO"}`);
   console.log(`${"─".repeat(40)}`);
 
   await produceEnrichedError(enrichedError);

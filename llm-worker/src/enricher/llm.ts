@@ -11,10 +11,9 @@ const DIAGNOSE_TOOL: Anthropic.Tool = {
     type: "object",
     properties: {
       diagnosis: { type: "string", description: "One sentence explaining the likely cause" },
-      action:    { type: "string", description: "One sentence on what the engineer should do" },
-      retryable: { type: "boolean", description: "Whether the error is retryable" }
+      action:    { type: "string", description: "One sentence on what the engineer should do" }
     },
-    required: ["diagnosis", "action", "retryable"]
+    required: ["diagnosis", "action"]
   }
 };
 
